@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
@@ -50,7 +48,7 @@ func authors() []string {
 		}
 		return lines
 	}
-	return []string{"Yasuhiro Matsumoto <mattn.jp@gmail.com>"}
+	return []string{"Werner Garcia <werner.garcia@suse.com>"}
 }
 
 func main() {
@@ -102,8 +100,6 @@ func main() {
 	//--------------------------------------------------------
 	// GtkImage
 	//--------------------------------------------------------
-	dir, _ := filepath.Split(os.Args[0])
-	imagefile := filepath.Join(dir, "../../data/go-gtk-logo.png")
 
 	label := gtk.NewLabel("Go Binding for GTK")
 	label.ModifyFontEasy("DejaVu Serif 15")
@@ -116,7 +112,10 @@ func main() {
 	entry.SetText("Hello world")
 	framebox1.Add(entry)
 
-	image := gtk.NewImageFromFile(imagefile)
+	// Generated with:
+	// go run ~/code/gtk/go-gtk/tools/make_inline_pixbuf/make_inline_pixbuf.go logoPNG logo.png > logo.gen.go
+	pb := gdkpixbuf.NewPixbufFromData(logoPNG)
+	image := gtk.NewImageFromPixbuf(pb)
 	framebox1.Add(image)
 
 	//--------------------------------------------------------
@@ -331,24 +330,7 @@ func main() {
 	cascademenu.SetSubmenu(submenu)
 
 	menuitem = gtk.NewMenuItemWithMnemonic("_About")
-	menuitem.Connect("activate", func() {
-		dialog := gtk.NewAboutDialog()
-		dialog.SetName("Go-Gtk Demo!")
-		dialog.SetProgramName("demo")
-		dialog.SetAuthors(authors())
-		dir, _ := filepath.Split(os.Args[0])
-		imagefile := filepath.Join(dir, "../../data/mattn-logo.png")
-		pixbuf, err := gdkpixbuf.NewPixbufFromFile(imagefile)
-		if err != nil {
-			log.Println("Could not load logo")
-		} else {
-			dialog.SetLogo(pixbuf)
-		}
-		dialog.SetLicense("The library is available under the same terms and conditions as the Go, the BSD style license, and the LGPL (Lesser GNU Public License). The idea is that if you can use Go (and Gtk) in a project, you should also be able to use go-gtk.")
-		dialog.SetWrapLicense(true)
-		dialog.Run()
-		dialog.Destroy()
-	})
+	menuitem.Connect("activate", makeAbout)
 	submenu.Append(menuitem)
 
 	//--------------------------------------------------------
@@ -367,4 +349,18 @@ func main() {
 	window.SetSizeRequest(600, 600)
 	window.ShowAll()
 	gtk.Main()
+}
+
+func makeAbout() {
+	dialog := gtk.NewAboutDialog()
+	dialog.SetPosition(gtk.WIN_POS_CENTER_ALWAYS)
+	dialog.SetName("ECM Distro Tools UI")
+	dialog.SetProgramName("ecm-distro-tools-ui")
+	dialog.SetAuthors(authors())
+	pb := gdkpixbuf.NewPixbufFromData(rancherLogoPNG)
+	dialog.SetLogo(pb)
+	dialog.SetLicense("The library is available under the same terms and conditions as the Go, the BSD style license, and the LGPL (Lesser GNU Public License). The idea is that if you can use Go (and Gtk) in a project, you should also be able to use go-gtk.")
+	dialog.SetWrapLicense(true)
+	dialog.Run()
+	dialog.Destroy()
 }

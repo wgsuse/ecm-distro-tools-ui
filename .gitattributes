@@ -1,0 +1,3 @@
+# Binary files (no line-ending conversions), diff using hexdump
+*.exe binary diff=hex
+ecm-distro-tools-ui binary diff=hex

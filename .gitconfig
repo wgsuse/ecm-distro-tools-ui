@@ -1,0 +1,11 @@
+# Add this file to your local GIT configuration with:
+#   git config --local include.path ../.gitconfig
+
+[core]
+  autocrlf = false
+  safecrlf = true
+  fileMode = false
+
+[diff "hex"]
+  textconv = hexdump -v -C
+  binary = true

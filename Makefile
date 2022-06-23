@@ -1,5 +1,14 @@
-demo.exe: clean
-	go build -o demo.exe -ldflags "-H windowsgui" demo.go attr_windows.go
+GO = go
+ARGS = build
+BUILD_DIR = .
+BINARY = ecm-distro-tools-ui
+
+# disable warnings
+.EXPORT_ALL_VARIABLES:
+CGO_CFLAGS=$(shell go env CGO_CFLAGS) -w
+
+$(BINARY): main.go
+	$(GO) $(ARGS) $(BUILD_DIR)
 
 clean:
-	rm -f demo.exe
+	rm -f $(BINARY)
