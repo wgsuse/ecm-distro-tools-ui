@@ -3,8 +3,9 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="window1">
-    <property name="default_width">800</property>
-    <property name="default_height">600</property>
+    <property name="width_request">640</property>
+    <property name="height_request">540</property>
+    <property name="window_position">center-always</property>
     <child>
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -42,10 +43,16 @@
                   <object class="GtkMenu" id="menu2">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkMenuItem" id="menu_disable">
+                      <object class="GtkCheckMenuItem" id="menu_disable">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">_Disable</property>
                         <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menu_disable_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separator1">
+                        <property name="visible">True</property>
                       </object>
                     </child>
                     <child>
@@ -54,6 +61,7 @@
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_menu_prefs_activate"/>
                       </object>
                     </child>
                   </object>
@@ -96,11 +104,14 @@
               <object class="GtkFrame" id="frame1">
                 <property name="visible">True</property>
                 <property name="label_xalign">0</property>
+                <property name="label_yalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignment1">
                     <property name="visible">True</property>
-                    <property name="left_padding">12</property>
+                    <property name="bottom_padding">8</property>
+                    <property name="left_padding">8</property>
+                    <property name="right_padding">8</property>
                     <child>
                       <object class="GtkVBox" id="vbox2">
                         <property name="visible">True</property>
@@ -141,10 +152,11 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkFileChooserButton" id="filechooserbutton4">
+                              <object class="GtkFileChooserButton" id="folder_button">
                                 <property name="visible">True</property>
                                 <property name="action">select-folder</property>
                                 <property name="title" translatable="yes">Select A Folder</property>
+                                <signal name="file_set" handler="on_folder_button_file_set"/>
                               </object>
                               <packing>
                                 <property name="position">1</property>
@@ -161,9 +173,8 @@
                   </object>
                 </child>
                 <child type="label">
-                  <object class="GtkLabel" id="label1">
+                  <object class="GtkLabel" id="label_frame1">
                     <property name="visible">True</property>
-                    <property name="use_markup">True</property>
                   </object>
                 </child>
               </object>
@@ -176,11 +187,14 @@
               <object class="GtkFrame" id="frame2">
                 <property name="visible">True</property>
                 <property name="label_xalign">0</property>
+                <property name="label_yalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
                   <object class="GtkAlignment" id="alignment2">
                     <property name="visible">True</property>
-                    <property name="left_padding">12</property>
+                    <property name="bottom_padding">8</property>
+                    <property name="left_padding">8</property>
+                    <property name="right_padding">8</property>
                     <child>
                       <object class="GtkVBox" id="vbox3">
                         <property name="visible">True</property>
@@ -198,6 +212,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="clicked" handler="on_button1_clicked"/>
                               </object>
                               <packing>
                                 <property name="position">0</property>
@@ -209,6 +224,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="clicked" handler="on_button2_clicked"/>
                               </object>
                               <packing>
                                 <property name="position">1</property>
@@ -220,6 +236,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="clicked" handler="on_button3_clicked"/>
                               </object>
                               <packing>
                                 <property name="position">2</property>
@@ -231,6 +248,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="clicked" handler="on_button4_clicked"/>
                               </object>
                               <packing>
                                 <property name="position">3</property>
@@ -265,7 +283,7 @@
                   </object>
                 </child>
                 <child type="label">
-                  <object class="GtkLabel" id="label4">
+                  <object class="GtkLabel" id="label_frame2">
                     <property name="visible">True</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -279,6 +297,124 @@
           </object>
           <packing>
             <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkDialog" id="dialog_prefs">
+    <property name="width_request">320</property>
+    <property name="height_request">100</property>
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">Preferences</property>
+    <property name="resizable">False</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-always</property>
+    <property name="type_hint">normal</property>
+    <child internal-child="vbox">
+      <object class="GtkVBox" id="dialog-vbox2">
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child>
+          <object class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">Under construction</property>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <object class="GtkHButtonBox" id="dialog-action_area2">
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button_ok">
+                <property name="label" translatable="yes">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_underline">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_cancel">
+                <property name="label" translatable="yes">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_underline">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="0">button_ok</action-widget>
+      <action-widget response="0">button_cancel</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkAboutDialog" id="aboutdialog1">
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">About ECM Distro Tools UI</property>
+    <property name="resizable">False</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-always</property>
+    <property name="type_hint">menu</property>
+    <property name="program_name">ECM Distro Tools UI</property>
+    <property name="version">v1.0</property>
+    <property name="copyright" translatable="yes">&#xA9; 2022 SUSE</property>
+    <property name="comments" translatable="yes">UI wrapper for the ecm-distro-tools</property>
+    <property name="website">https://github.com/wgsuse/ecm-distro-tools-ui</property>
+    <property name="website_label" translatable="yes">GitGub Repository</property>
+    <property name="license" translatable="yes">The library is available under the same terms and conditions as the Go,
+the BSD style license, and the LGPL (Lesser GNU Public License).
+The idea is that if you can use Go (and Gtk) in a project,
+you should also be able to use go-gtk.</property>
+    <property name="authors">Werner Garcia &lt;werner.garcia@suse.com&gt;</property>
+    <property name="logo">rancher-logo-cow-black.png</property>
+    <property name="wrap_license">True</property>
+    <child internal-child="vbox">
+      <object class="GtkVBox" id="dialog-vbox3">
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">8</property>
+        <child>
+          <object class="GtkLabel" id="label1none">
+            <property name="visible">True</property>
+          </object>
+          <packing>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <object class="GtkHButtonBox" id="dialog-action_area3">
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </object>
