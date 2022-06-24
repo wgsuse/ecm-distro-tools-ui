@@ -14,7 +14,7 @@ BINARY    := ecm-distro-tools-ui$(EXT)
 .EXPORT_ALL_VARIABLES:
 CGO_CFLAGS=$(shell $(GO) env CGO_CFLAGS) -w
 
-$(BINDIR)/$(BINARY): $(shell ls *.go)
+$(BINDIR)/$(BINARY): $(shell ls *.go *.glade)
 	$(GO) build -o $(BINDIR)/$(BINARY) -ldflags "$(LDFLAGS)" .
 
 clean:
