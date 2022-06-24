@@ -1,14 +1,21 @@
-GO = go
-ARGS = build
-BUILD_DIR = .
-BINARY = ecm-distro-tools-ui
+.PHONY: clean
+
+# We are on windows
+ifdef OS
+   EXT = .exe
+   LDFLAGS = -H windowsgui
+endif
+
+GO         = go
+BINDIR    := bin
+BINARY    := ecm-distro-tools-ui$(EXT)
 
 # disable warnings
 .EXPORT_ALL_VARIABLES:
-CGO_CFLAGS=$(shell go env CGO_CFLAGS) -w
+CGO_CFLAGS=$(shell $(GO) env CGO_CFLAGS) -w
 
-$(BINARY): main.go
-	$(GO) $(ARGS) $(BUILD_DIR)
+$(BINDIR)/$(BINARY): $(shell ls *.go)
+	$(GO) build -o $(BINDIR)/$(BINARY) -ldflags "$(LDFLAGS)" .
 
 clean:
-	rm -f $(BINARY)
+	rm -f $(BINDIR)/$(BINARY)

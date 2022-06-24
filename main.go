@@ -1,67 +1,29 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"os/exec"
-	"regexp"
-	"runtime"
-	"sort"
-	"strings"
+	"unsafe"
 
+	"github.com/mattn/go-gtk/gdk"
 	"github.com/mattn/go-gtk/gdkpixbuf"
 	"github.com/mattn/go-gtk/glib"
 	"github.com/mattn/go-gtk/gtk"
+	"github.com/wgsuse/ecm-distro-tools-ui/images"
+	"github.com/wgsuse/ecm-distro-tools-ui/include"
 )
 
-var authorList []string = nil
-
-func authors() []string {
-	if authorList != nil {
-		return authorList
-	}
-	cmd := exec.Command("git", "log")
-	if runtime.GOOS == "windows" {
-		cmd.SysProcAttr = SyscallAttrs()
-	}
-	if b, err := cmd.Output(); err == nil {
-		lines := strings.Split(string(b), "\n")
-
-		var a []string
-		r := regexp.MustCompile(`^Author:\s*([^ <]+).*$`)
-		for _, e := range lines {
-			ms := r.FindStringSubmatch(e)
-			if ms == nil {
-				continue
-			}
-			a = append(a, ms[1])
-		}
-		sort.Strings(a)
-		var p string
-		lines = []string{}
-		for _, e := range a {
-			if p == e {
-				continue
-			}
-			lines = append(lines, e)
-			p = e
-		}
-		return lines
-	}
-	return []string{"Werner Garcia <werner.garcia@suse.com>"}
-}
+const MinWidth = 1024
+const MinHeight = 768
 
 func main() {
-	authorList = authors()
-
 	gtk.Init(&os.Args)
 
 	window := gtk.NewWindow(gtk.WINDOW_TOPLEVEL)
 	window.SetPosition(gtk.WIN_POS_CENTER)
-	window.SetTitle("GTK Go!")
+	window.SetTitle("ECM Distro Tools UI")
 	window.SetIconName("gtk-dialog-info")
 	window.Connect("destroy", func(ctx *glib.CallbackContext) {
-		fmt.Println("got destroy!", ctx.Data().(string))
+		//fmt.Println("got destroy!", ctx.Data().(string))
 		gtk.MainQuit()
 	}, "foo")
 
@@ -113,8 +75,8 @@ func main() {
 	framebox1.Add(entry)
 
 	// Generated with:
-	// go run ~/code/gtk/go-gtk/tools/make_inline_pixbuf/make_inline_pixbuf.go logoPNG logo.png > logo.gen.go
-	pb := gdkpixbuf.NewPixbufFromData(logoPNG)
+	// go run ~/code/go/bin/make_inline_pixbuf logoPNG logo.png > logo.gen.go
+	pb := gdkpixbuf.NewPixbufFromData(images.LogoPNG)
 	image := gtk.NewImageFromPixbuf(pb)
 	framebox1.Add(image)
 
@@ -123,7 +85,7 @@ func main() {
 	//--------------------------------------------------------
 	scale := gtk.NewHScaleWithRange(0, 100, 1)
 	scale.Connect("value-changed", func() {
-		fmt.Println("scale:", int(scale.GetValue()))
+		//fmt.Println("scale:", int(scale.GetValue()))
 	})
 	framebox2.Add(scale)
 
@@ -137,7 +99,7 @@ func main() {
 	//--------------------------------------------------------
 	button := gtk.NewButtonWithLabel("Button with label")
 	button.Clicked(func() {
-		fmt.Println("button clicked:", button.GetLabel())
+		//fmt.Println("button clicked:", button.GetLabel())
 		messagedialog := gtk.NewMessageDialog(
 			button.GetTopLevelAsWindow(),
 			gtk.DIALOG_MODAL,
@@ -145,7 +107,7 @@ func main() {
 			gtk.BUTTONS_OK,
 			entry.GetText())
 		messagedialog.Response(func() {
-			fmt.Println("Dialog OK!")
+			//fmt.Println("Dialog OK!")
 
 			//--------------------------------------------------------
 			// GtkFileChooserDialog
@@ -160,7 +122,7 @@ func main() {
 			filter.AddPattern("*.go")
 			filechooserdialog.AddFilter(filter)
 			filechooserdialog.Response(func() {
-				fmt.Println(filechooserdialog.GetFilename())
+				//fmt.Println(filechooserdialog.GetFilename())
 				filechooserdialog.Destroy()
 			})
 			filechooserdialog.Run()
@@ -175,10 +137,10 @@ func main() {
 	//--------------------------------------------------------
 	fontbutton := gtk.NewFontButton()
 	fontbutton.Connect("font-set", func() {
-		fmt.Println("title:", fontbutton.GetTitle())
-		fmt.Println("fontname:", fontbutton.GetFontName())
-		fmt.Println("use_size:", fontbutton.GetUseSize())
-		fmt.Println("show_size:", fontbutton.GetShowSize())
+		//fmt.Println("title:", fontbutton.GetTitle())
+		//fmt.Println("fontname:", fontbutton.GetFontName())
+		//fmt.Println("use_size:", fontbutton.GetUseSize())
+		//fmt.Println("show_size:", fontbutton.GetShowSize())
 	})
 	buttons.Add(fontbutton)
 	framebox2.PackStart(buttons, false, false, 0)
@@ -240,7 +202,7 @@ func main() {
 	comboboxentry.AppendText("Tiger")
 	comboboxentry.AppendText("Elephant")
 	comboboxentry.Connect("changed", func() {
-		fmt.Println("value:", comboboxentry.GetActiveText())
+		//fmt.Println("value:", comboboxentry.GetActiveText())
 	})
 	combos.Add(comboboxentry)
 
@@ -253,7 +215,7 @@ func main() {
 	combobox.AppendText("Apple")
 	combobox.SetActive(1)
 	combobox.Connect("changed", func() {
-		fmt.Println("value:", combobox.GetActiveText())
+		//fmt.Println("value:", combobox.GetActiveText())
 	})
 	combos.Add(combobox)
 
@@ -273,7 +235,7 @@ func main() {
 	buffer.GetEndIter(&end)
 	buffer.Insert(&end, "World!")
 	tag := buffer.CreateTag("bold", map[string]interface {
-	}{"background": "#FF0000", "weight": "700"})
+	}{"background": "#FF0000", "weight": 700})
 	buffer.GetStartIter(&start)
 	buffer.GetEndIter(&end)
 	buffer.ApplyTag(tag, &start, &end)
@@ -281,7 +243,7 @@ func main() {
 	framebox2.Add(swin)
 
 	buffer.Connect("changed", func() {
-		fmt.Println("changed")
+		//fmt.Println("changed")
 	})
 
 	//--------------------------------------------------------
@@ -315,7 +277,7 @@ func main() {
 		fsd := gtk.NewFontSelectionDialog("Font")
 		fsd.SetFontName(fontbutton.GetFontName())
 		fsd.Response(func() {
-			fmt.Println(fsd.GetFontName())
+			//fmt.Println(fsd.GetFontName())
 			fontbutton.SetFontName(fsd.GetFontName())
 			fsd.Destroy()
 		})
@@ -339,14 +301,33 @@ func main() {
 	statusbar := gtk.NewStatusbar()
 	context_id := statusbar.GetContextId("go-gtk")
 	statusbar.Push(context_id, "GTK binding for Go!")
+	statusbar.SetHasResizeGrip(true)
 
 	framebox2.PackStart(statusbar, false, false, 0)
 
 	//--------------------------------------------------------
 	// Event
 	//--------------------------------------------------------
+
+	event := make(chan interface{})
+
 	window.Add(vbox)
-	window.SetSizeRequest(600, 600)
+	window.SetSizeRequest(MinWidth, MinHeight)
+	window.Connect("configure-event", func(ctx *glib.CallbackContext) {
+		arg := ctx.Args(0)
+		event <- *(**gdk.EventConfigure)(unsafe.Pointer(&arg))
+	})
+
+	go func() {
+		for {
+			<-event
+			w, h := window.GetSize()
+			if w < MinWidth || h < MinHeight {
+				window.Resize(MinWidth, MinHeight)
+			}
+		}
+	}()
+
 	window.ShowAll()
 	gtk.Main()
 }
@@ -356,8 +337,8 @@ func makeAbout() {
 	dialog.SetPosition(gtk.WIN_POS_CENTER_ALWAYS)
 	dialog.SetName("ECM Distro Tools UI")
 	dialog.SetProgramName("ecm-distro-tools-ui")
-	dialog.SetAuthors(authors())
-	pb := gdkpixbuf.NewPixbufFromData(rancherLogoPNG)
+	dialog.SetAuthors(include.Authors())
+	pb := gdkpixbuf.NewPixbufFromData(images.RancherLogoPNG)
 	dialog.SetLogo(pb)
 	dialog.SetLicense("The library is available under the same terms and conditions as the Go, the BSD style license, and the LGPL (Lesser GNU Public License). The idea is that if you can use Go (and Gtk) in a project, you should also be able to use go-gtk.")
 	dialog.SetWrapLicense(true)
