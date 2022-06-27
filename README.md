@@ -1,10 +1,28 @@
 # ECM Distro Tools UI
 
+## UI Development
+
+1. Download glade from https://glade.gnome.org/
+2. Open the main.glade file in the editor
+3. Start designing!
+
+![glade screenshot](glade.png "Glade screenshot")
+
+## Instructions for Linux:
+
+1. Follow the instructions on https://github.com/mattn/go-gtk to install the GTK2 development libraries.
+2. Clone [ecm-distro-tools-ui repo](https://github.com/wgsuse/ecm-distro-tools-ui)
+3. Run `go get ...`
+4. Run `make`
+5. Execute `bin/ecm-distro-tools-ui`
+
+## Instructions for Windows:
+
 ### Steps to execute:
 
 1. Download the GTK2 runtime from:
 	https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer
-2. Run the binary `ecm-distro-tools-ui.exe`
+2. Run the binary `bin/ecm-distro-tools-ui.exe`
 
 ### Steps to build:
 
